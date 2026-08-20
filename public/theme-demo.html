@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Theme demo — yukhyShell5</title>
+    <link rel="stylesheet" href="https://yukhyshell5.github.io/theme.css" />
+  </head>
+  <body>
+    <div class="ys-container">
+      <div class="ys-terminal" style="margin-bottom: 2rem">
+        <div class="ys-terminal-bar">theme.css — preview</div>
+        <div class="ys-terminal-body">
+          <span class="ys-cmd">$</span> echo "thème partagé"<br />
+          <span class="ys-str">thème partagé</span>
+        </div>
+      </div>
+
+      <h1>Titre de niveau 1</h1>
+      <p>
+        Paragraphe avec <strong>texte gras</strong>, <em>italique</em>, du
+        <a href="#">lien</a>, du <code>code inline</code> et un
+        <span class="ys-primary">élément accent</span>.
+      </p>
+
+      <h2>Boutons</h2>
+      <p>
+        <button>Bouton</button>
+        <button class="btn-primary">Primaire</button>
+        <button class="btn-success">Succès</button>
+        <button class="btn-danger">Danger</button>
+        <button disabled>Désactivé</button>
+      </p>
+
+      <h2>Formulaires</h2>
+      <p>
+        <input type="text" placeholder="un champ texte" />
+        <input type="password" placeholder="mot de passe" />
+        <select>
+          <option>Option 1</option>
+          <option>Option 2</option>
+        </select>
+        <label><input type="checkbox" /> case à cocher</label>
+        <input type="range" />
+      </p>
+
+      <h2>Cartes &amp; badges</h2>
+      <div class="ys-grid">
+        <div class="ys-card">
+          <span class="ys-badge ys-badge-primary">prim</span>
+          <span class="ys-badge ys-badge-success">ok</span>
+          <span class="ys-badge ys-badge-warning">warn</span>
+          <span class="ys-badge ys-badge-danger">crit</span>
+          <p class="ys-muted" style="margin-top: 1rem">
+            Une carte avec du contenu muet.
+          </p>
+        </div>
+        <div class="ys-card">
+          <p class="ys-dim">Contenu secondaire</p>
+          <p class="ys-cmd">$ ls</p>
+        </div>
+      </div>
+
+      <h2>Alertes</h2>
+      <div class="ys-alert ys-alert-info">Information — callout info.</div>
+      <div class="ys-alert ys-alert-success">Succès — callout success.</div>
+      <div class="ys-alert ys-alert-warning">Attention — callout warning.</div>
+      <div class="ys-alert ys-alert-danger">Danger — callout danger.</div>
+
+      <h2>Table</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Colonne</th>
+            <th>Valeur</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>a</code></td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td><code>b</code></td>
+            <td>2</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Code</h2>
+      <pre><code>def hello():
+    print("hello world")</code></pre>
+    </div>
+  </body>
+</html>

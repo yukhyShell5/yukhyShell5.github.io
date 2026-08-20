@@ -26,6 +26,7 @@ jobs:
         with:
           repository: yukhyShell5/vault
           path: vault
+          token: ${{ secrets.VAULT }}
 
       - name: Setup Node
         uses: actions/setup-node@v4

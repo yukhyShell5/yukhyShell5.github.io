@@ -16,44 +16,59 @@ import {
   Bug,
   Mail,
   Github,
-  Twitter,
   ExternalLink,
   Shield,
   Gamepad2,
   Lock,
   BookOpen,
+  KeyRound,
 } from "lucide-react";
+import { useI18n } from "@/components/i18n";
 
-const commands = [
-  {
-    group: "Navigation",
-    items: [
-      { icon: User, label: "About", action: "scroll", target: "#about" },
-      { icon: Bug, label: "Playground", action: "scroll", target: "#playground" },
-      { icon: Mail, label: "Contact", action: "scroll", target: "#contact" },
-    ],
-  },
-  {
-    group: "Projects",
-    items: [
-      { icon: Shield, label: "Logs Anonymizer", action: "navigate", target: "/logs-anonymizer" },
-      { icon: Gamepad2, label: "Chess Learn", action: "navigate", target: "/chess-learn" },
-      { icon: Lock, label: "Crackstation", action: "navigate", target: "/crackstation", disabled: true },
-      { icon: BookOpen, label: "Wiki", action: "navigate", target: "/wiki", disabled: true },
-    ],
-  },
-  {
-    group: "Links",
-    items: [
-      { icon: Github, label: "GitHub", action: "link", target: "https://github.com/yukhyShell5" },
-      { icon: Twitter, label: "Twitter", action: "link", target: "https://twitter.com/" },
-    ],
-  },
-];
+interface PaletteItem {
+  icon: React.ElementType;
+  label: string;
+  action: "scroll" | "navigate" | "link";
+  target: string;
+  disabled?: boolean;
+}
+
+interface PaletteGroup {
+  group: string;
+  items: PaletteItem[];
+}
 
 export function CommandPalette() {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const router = useRouter();
+
+  const commands: PaletteGroup[] = [
+    {
+      group: t("cmd.navigation"),
+      items: [
+        { icon: User, label: t("nav.about"), action: "scroll", target: "#about" },
+        { icon: Bug, label: t("nav.playground"), action: "scroll", target: "#playground" },
+        { icon: Mail, label: t("nav.contact"), action: "scroll", target: "#contact" },
+      ],
+    },
+    {
+      group: t("cmd.projects"),
+      items: [
+        { icon: Shield, label: t("nav.project.logs"), action: "navigate", target: "/logs-anonymizer" },
+        { icon: Gamepad2, label: t("nav.project.chess"), action: "navigate", target: "/chess-learn" },
+        { icon: Lock, label: t("nav.project.crackstation"), action: "navigate", target: "/crackstation", disabled: true },
+        { icon: BookOpen, label: t("nav.project.wiki"), action: "navigate", target: "/wiki" },
+      ],
+    },
+    {
+      group: t("cmd.links"),
+      items: [
+        { icon: Github, label: "GitHub", action: "link", target: "https://github.com/yukhyShell5" },
+        { icon: KeyRound, label: t("contact.pgp"), action: "link", target: "/pgp.asc" },
+      ],
+    },
+  ];
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -83,26 +98,26 @@ export function CommandPalette() {
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
-      <CommandInput placeholder="Type a command or search..." />
+      <CommandInput placeholder={t("cmd.placeholder")} />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandEmpty>{t("cmd.empty")}</CommandEmpty>
         {commands.map((group, idx) => (
           <div key={group.group}>
             <CommandGroup heading={group.group}>
               {group.items.map((item) => (
                 <CommandItem
                   key={item.label}
-                  onSelect={() => handleSelect(item.action, item.target, (item as any).disabled)}
-                  className={`flex items-center gap-3 cursor-pointer ${
-                    (item as any).disabled ? "opacity-50" : ""
+                  onSelect={() => handleSelect(item.action, item.target, item.disabled)}
+                  className={`flex items-center gap-3 cursor-pointer font-mono ${
+                    item.disabled ? "opacity-50" : ""
                   }`}
-                  disabled={(item as any).disabled}
+                  disabled={item.disabled}
                 >
                   <item.icon className="w-4 h-4 text-muted-foreground" />
                   <span>{item.label}</span>
-                  {(item as any).disabled && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary ml-auto">
-                      Soon
+                  {item.disabled && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary ml-auto">
+                      {t("cmd.soon")}
                     </span>
                   )}
                   {item.action === "link" && (

@@ -1,279 +1,282 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
-import { ChevronDown, Shield, Code, Search, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { ChevronDown, Shield, Code, Search } from "lucide-react";
+import { useI18n } from "@/components/i18n";
 
-// Animated gradient orbs
-function GradientOrbs() {
+// Typed terminal session: commands are typed char by char, outputs appear instantly
+interface TermLine {
+  kind: "cmd" | "out" | "out-muted" | "out-green" | "out-blue" | "out-yellow";
+  text: string;
+}
+
+function TerminalSession() {
+  const { t } = useI18n();
+
+  const commands = useMemo(
+    () => [
+      { cmd: t("hero.cmd.whoami"), output: [{ kind: "out" as const, text: "yukhyShell5" }] },
+      {
+        cmd: t("hero.cmd.cat"),
+        output: [{ kind: "out-green" as const, text: t("hero.cmd.profil") }],
+      },
+      {
+        cmd: t("hero.cmd.ls"),
+        output: [{ kind: "out-blue" as const, text: t("hero.cmd.stack") }],
+      },
+      {
+        cmd: t("hero.cmd.stats"),
+        output: [
+          { kind: "out-muted" as const, text: "  audits: 20+    cves: 5+    bounties: 10+    exp: 3+ yrs" },
+        ],
+      },
+    ],
+    [t]
+  );
+
+  // Build a flat timeline: each command gets a typing phase then its output(s)
+  type TimelineItem =
+    | { type: "cmd"; cmd: string }
+    | { type: "out"; line: TermLine };
+  const timeline: TimelineItem[] = useMemo(
+    () =>
+      commands.flatMap<TimelineItem>((c) => [
+        { type: "cmd", cmd: c.cmd },
+        ...c.output.map<TimelineItem>((line) => ({ type: "out", line })),
+      ]),
+    [commands]
+  );
+
+  const [timelineIdx, setTimelineIdx] = useState(0);
+  const [charIdx, setCharIdx] = useState(0);
+
+  useEffect(() => {
+    if (timelineIdx >= timeline.length) return;
+    const item = timeline[timelineIdx];
+
+    if (item.type === "cmd") {
+      if (charIdx < item.cmd.length) {
+        const timeout = setTimeout(() => setCharIdx((c) => c + 1), 28);
+        return () => clearTimeout(timeout);
+      }
+      const timeout = setTimeout(() => {
+        setTimelineIdx((i) => i + 1);
+        setCharIdx(0);
+      }, 220);
+      return () => clearTimeout(timeout);
+    }
+
+    // output: show instantly, move on
+    const timeout = setTimeout(() => {
+      setTimelineIdx((i) => i + 1);
+      setCharIdx(0);
+    }, 160);
+    return () => clearTimeout(timeout);
+  }, [timelineIdx, charIdx, timeline]);
+
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Primary orb */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ 
-          opacity: [0.15, 0.25, 0.15],
-          scale: [1, 1.2, 1],
-          x: [0, 50, 0],
-          y: [0, -30, 0],
-        }}
-        transition={{ 
-          duration: 8, 
-          repeat: Infinity, 
-          ease: "easeInOut" 
-        }}
-        className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-primary/30 blur-[120px]"
-      />
-      {/* Secondary orb */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ 
-          opacity: [0.1, 0.2, 0.1],
-          scale: [1.2, 1, 1.2],
-          x: [0, -30, 0],
-          y: [0, 50, 0],
-        }}
-        transition={{ 
-          duration: 10, 
-          repeat: Infinity, 
-          ease: "easeInOut",
-          delay: 1 
-        }}
-        className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-success/20 blur-[100px]"
-      />
-      {/* Accent orb */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ 
-          opacity: [0.05, 0.15, 0.05],
-          scale: [1, 1.3, 1],
-        }}
-        transition={{ 
-          duration: 12, 
-          repeat: Infinity, 
-          ease: "easeInOut",
-          delay: 2 
-        }}
-        className="absolute top-1/2 right-1/3 w-[300px] h-[300px] rounded-full bg-warning/15 blur-[80px]"
-      />
+    <div className="border border-border rounded bg-card overflow-hidden shadow-[0_0_60px_rgba(203,166,247,0.06)] text-left">
+      {/* Terminal header */}
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-[#1e1e22]">
+        <div className="w-3 h-3 rounded-full bg-[#f38ba8]/80" />
+        <div className="w-3 h-3 rounded-full bg-[#f9e2af]/80" />
+        <div className="w-3 h-3 rounded-full bg-[#a6e3a1]/80" />
+        <span className="ml-2 text-xs text-term-muted font-mono">
+          {t("hero.terminal.title")}
+        </span>
+        <span className="ml-auto text-[10px] text-term-muted font-mono">bash</span>
+      </div>
+
+      {/* Terminal body */}
+      <div className="p-4 sm:p-5 font-mono text-[13px] leading-6 min-h-[280px]">
+        {/* Commands already completed */}
+        {timeline.slice(0, timelineIdx).map((item, i) => {
+          if (item.type === "out") {
+            const cls =
+              item.line.kind === "out-green"
+                ? "text-term-cmd"
+                : item.line.kind === "out-blue"
+                  ? "text-term-prompt"
+                  : item.line.kind === "out-muted"
+                    ? "text-term-dim"
+                    : "text-foreground";
+            return (
+              <div key={i} className={cls}>
+                {item.line.text}
+              </div>
+            );
+          }
+          return (
+            <div key={i} className="text-foreground">
+              <span className="text-term-prompt">❯ </span>
+              {item.cmd}
+            </div>
+          );
+        })}
+
+        {/* Current command being typed */}
+        {timeline[timelineIdx]?.type === "cmd" && (
+          <div className="text-foreground">
+            <span className="text-term-prompt">❯ </span>
+            {timeline[timelineIdx].cmd.slice(0, charIdx)}
+            <span className="term-cursor" />
+          </div>
+        )}
+
+        {/* Final idle prompt */}
+        {timelineIdx >= timeline.length && (
+          <div className="text-foreground">
+            <span className="text-term-prompt">❯ </span>
+            <span className="term-cursor" />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-// Floating particles
-function FloatingParticles() {
-  const particles = Array.from({ length: 20 }, (_, i) => ({
-    id: i,
-    size: Math.random() * 3 + 1,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    duration: Math.random() * 20 + 15,
-    delay: Math.random() * 5,
-  }));
-
+function StatusBar() {
+  const { t } = useI18n();
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {particles.map((particle) => (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex items-center gap-3 font-mono text-sm mb-8"
+    >
+      <span className="relative flex h-2.5 w-2.5">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-60" />
+        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-success" />
+      </span>
+      <span className="text-foreground">yukhyShell5</span>
+      <span className="text-term-dim">working ·</span>
+      <span className="text-term-cmd">{t("hero.role")}</span>
+      <span className="hidden sm:inline text-term-muted">
+        · {t("hero.status")}
+      </span>
+    </motion.div>
+  );
+}
+
+function StatsRow() {
+  const { t } = useI18n();
+  const stats = [
+    { value: "20+", label: t("hero.stat.audits") },
+    { value: "5+", label: t("hero.stat.cves") },
+    { value: "10+", label: t("hero.stat.bounties") },
+    { value: "3+", label: t("hero.stat.years") },
+  ];
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 font-mono text-sm"
+    >
+      {stats.map((s) => (
+        <div key={s.label} className="flex items-baseline gap-2">
+          <span className="text-lg font-semibold text-foreground">{s.value}</span>
+          <span className="text-term-muted text-xs">{s.label}</span>
+        </div>
+      ))}
+    </motion.div>
+  );
+}
+
+function BadgeRow() {
+  const { t } = useI18n();
+  const badges = [
+    { icon: Shield, label: t("hero.badge.audits") },
+    { icon: Code, label: t("hero.badge.evm") },
+    { icon: Search, label: t("hero.badge.research") },
+  ];
+  return (
+    <div className="flex flex-wrap justify-center gap-3">
+      {badges.map((b, i) => (
         <motion.div
-          key={particle.id}
-          initial={{ 
-            opacity: 0,
-            x: `${particle.x}vw`,
-            y: `${particle.y}vh`,
-          }}
-          animate={{ 
-            opacity: [0, 0.6, 0],
-            y: [`${particle.y}vh`, `${particle.y - 30}vh`],
-          }}
-          transition={{ 
-            duration: particle.duration,
-            repeat: Infinity,
-            delay: particle.delay,
-            ease: "linear",
-          }}
-          className="absolute rounded-full bg-primary/50"
-          style={{ 
-            width: particle.size, 
-            height: particle.size,
-          }}
-        />
+          key={b.label}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
+          className="flex items-center gap-2 px-3 py-1.5 rounded border border-border bg-card/60 font-mono text-xs text-muted-foreground"
+        >
+          <b.icon className="w-3.5 h-3.5 text-primary" />
+          {b.label}
+        </motion.div>
       ))}
     </div>
   );
 }
 
-// Animated text reveal
-function AnimatedText({ children, delay = 0 }: { children: string; delay?: number }) {
-  return (
-    <motion.span
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
-    >
-      {children}
-    </motion.span>
-  );
-}
-
-// Glowing border card
-function GlowingBadge({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    setMousePosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.8 }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="relative group"
-    >
-      {/* Glow effect */}
-      <div
-        className="absolute -inset-px rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"
-        style={{
-          background: isHovered
-            ? `radial-gradient(120px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(59, 130, 246, 0.3), transparent 40%)`
-            : "none",
-        }}
-      />
-      
-      <div className="relative flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card/50 backdrop-blur-sm text-sm group-hover:border-primary/50 transition-colors">
-        <Icon className="w-4 h-4 text-primary" />
-        <span>{label}</span>
-      </div>
-    </motion.div>
-  );
-}
-
-// Main title with gradient animation
-function AnimatedTitle() {
-  return (
-    <motion.h1
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="text-5xl md:text-7xl font-bold mb-6 relative"
-    >
-      <span className="relative">
-        <span className="bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
-          yukhyShell5
-        </span>
-        {/* Shimmer effect */}
-        <motion.span
-          initial={{ x: "-100%" }}
-          animate={{ x: "200%" }}
-          transition={{ 
-            duration: 2, 
-            repeat: Infinity, 
-            repeatDelay: 3,
-            ease: "easeInOut" 
-          }}
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent bg-clip-text"
-          style={{ WebkitBackgroundClip: "text" }}
-        />
-      </span>
-    </motion.h1>
-  );
-}
-
-// Status indicator with pulse
-function StatusIndicator() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-      className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-border/50 bg-card/30 backdrop-blur-md text-sm mb-10"
-    >
-      <span className="relative flex h-2.5 w-2.5">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
-        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-success" />
-      </span>
-      <span className="text-muted-foreground">Web3 Security Researcher</span>
-      <Sparkles className="w-4 h-4 text-primary" />
-    </motion.div>
-  );
-}
-
 export function Hero() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
+  const { t } = useI18n();
 
   return (
-    <section className="min-h-screen flex flex-col items-center justify-center relative px-6 overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:64px_64px]" />
-      <GradientOrbs />
-      <FloatingParticles />
-      
-      {/* Vignette */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
+    <section className="min-h-screen flex flex-col items-center justify-center relative px-6 pt-24 pb-16 overflow-hidden">
+      {/* Background grid + vignette */}
+      <div className="absolute inset-0 bg-grid" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(23,23,26,0.7)_100%)]" />
 
-      {/* Content */}
-      <div className="text-center z-10 max-w-4xl">
-        <StatusIndicator />
+      <div className="w-full max-w-3xl z-10">
+        <StatusBar />
 
-        <AnimatedTitle />
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.1 }}
+          className="text-4xl sm:text-6xl font-bold mb-4 font-mono tracking-tight"
+        >
+          <span className="text-primary">~/</span>
+          yukhyShell5
+        </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="text-lg md:text-xl text-muted-foreground mb-14 max-w-2xl mx-auto leading-relaxed"
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="text-base sm:text-lg text-muted-foreground mb-10 max-w-2xl leading-relaxed font-mono"
         >
-          Blockchain security researcher specializing in{" "}
-          <span className="text-foreground font-medium">EVM smart contract auditing</span>,{" "}
-          <span className="text-foreground font-medium">DeFi security</span>, and{" "}
-          <span className="text-foreground font-medium">vulnerability research</span>.
+          {t("hero.subtitle")}
         </motion.p>
 
-        <div className="flex flex-wrap justify-center gap-4 mb-20">
-          <GlowingBadge icon={Shield} label="Smart Contract Audits" />
-          <GlowingBadge icon={Code} label="EVM / Solidity" />
-          <GlowingBadge icon={Search} label="Vulnerability Research" />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.3 }}
+          className="mb-10"
+        >
+          <TerminalSession />
+        </motion.div>
+
+        <StatsRow />
+
+        <div className="mt-10 mb-16">
+          <BadgeRow />
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 0.5 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.4, duration: 0.5 }}
+          className="flex justify-center"
         >
           <a
             href="#about"
-            className="group inline-flex flex-col items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="group inline-flex flex-col items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-mono"
           >
-            <span className="text-sm">Discover</span>
+            <span className="text-xs">{t("hero.discover")}</span>
             <motion.div
               animate={{ y: [0, 5, 0] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             >
-              <ChevronDown className="w-5 h-5" />
+              <ChevronDown className="w-4 h-4" />
             </motion.div>
           </a>
         </motion.div>
       </div>
 
-      {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent pointer-events-none" />
     </section>
   );
 }

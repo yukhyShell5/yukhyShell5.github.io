@@ -18,7 +18,16 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Wiki / cours
+
+La section `/wiki` est générée à partir du vault Obsidian (`vault/cours/`) au moment du build.
+Le dossier `cours/` est cherché dans cet ordre :
+
+1. la variable d'environnement `VAULT_PATH`
+2. `../vault/cours` (développement local : vault en voisin du dépôt)
+3. `vault/cours` (CI : le workflow GitHub Pages clone `yukhyShell5/vault` dans l'espace de travail)
+
+Si le vault est absent, le site se construit quand même et `/wiki` affiche un message d'avertissement.
 
 ## Learn More
 

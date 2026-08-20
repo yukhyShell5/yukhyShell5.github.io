@@ -5,25 +5,26 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Eye, EyeOff, ChevronRight, AlertTriangle, CheckCircle } from "lucide-react";
+import { useI18n, type TranslationKey } from "@/components/i18n";
 
 interface Vulnerability {
   id: string;
-  title: string;
+  titleKey: TranslationKey;
   severity: "critical" | "high" | "medium" | "low";
-  category: string;
+  categoryKey: TranslationKey;
   code: string[];
   vulnerableLine: number;
-  hint: string;
-  explanation: string;
-  poc?: string;
+  hintKey: TranslationKey;
+  explanationKey: TranslationKey;
+  pocKey?: TranslationKey;
 }
 
 const vulnerabilities: Vulnerability[] = [
   {
     id: "reentrancy-1",
-    title: "Reentrancy Attack",
+    titleKey: "playground.v1.title",
     severity: "critical",
-    category: "Reentrancy",
+    categoryKey: "playground.v1.category",
     code: [
       "contract Vulnerable {",
       "    mapping(address => uint) public balances;",
@@ -37,15 +38,15 @@ const vulnerabilities: Vulnerability[] = [
       "}",
     ],
     vulnerableLine: 5,
-    hint: "Check the order of operations. What happens before the balance is set to 0?",
-    explanation: "The external call is made before updating the balance to 0. An attacker can recursively call withdraw() before the balance is updated, draining the contract.",
-    poc: "Attacker contract calls withdraw -> receives ETH -> fallback calls withdraw again -> repeat until drained",
+    hintKey: "playground.v1.hint",
+    explanationKey: "playground.v1.explanation",
+    pocKey: "playground.v1.poc",
   },
   {
     id: "access-control-1",
-    title: "Missing Access Control",
+    titleKey: "playground.v2.title",
     severity: "high",
-    category: "Access Control",
+    categoryKey: "playground.v2.category",
     code: [
       "contract Vault {",
       "    address public owner;",
@@ -61,14 +62,14 @@ const vulnerabilities: Vulnerability[] = [
       "}",
     ],
     vulnerableLine: 3,
-    hint: "Who can call the setOwner function?",
-    explanation: "The setOwner function has no access control modifier. Anyone can call it and become the owner, then withdraw all funds.",
+    hintKey: "playground.v2.hint",
+    explanationKey: "playground.v2.explanation",
   },
   {
     id: "oracle-1",
-    title: "Oracle Manipulation",
+    titleKey: "playground.v3.title",
     severity: "critical",
-    category: "Oracle",
+    categoryKey: "playground.v3.category",
     code: [
       "contract Lending {",
       "    IUniswapV2Pair public pair;",
@@ -85,19 +86,21 @@ const vulnerabilities: Vulnerability[] = [
       "}",
     ],
     vulnerableLine: 4,
-    hint: "How is the price calculated? Can it be manipulated in a single transaction?",
-    explanation: "Using spot reserves from a DEX as an oracle is vulnerable to flash loan attacks. An attacker can manipulate the price by swapping large amounts, liquidate positions, then swap back.",
+    hintKey: "playground.v3.hint",
+    explanationKey: "playground.v3.explanation",
+    pocKey: "playground.v3.poc",
   },
 ];
 
-const severityColors = {
-  critical: "bg-critical/10 text-critical border-critical/20",
-  high: "bg-warning/10 text-warning border-warning/20",
-  medium: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
-  low: "bg-success/10 text-success border-success/20",
+const severityStyles = {
+  critical: { dot: "bg-[#f38ba8]", cls: "text-[#f38ba8] border-[#f38ba8]/30 bg-[#f38ba8]/10" },
+  high: { dot: "bg-[#f9e2af]", cls: "text-[#f9e2af] border-[#f9e2af]/30 bg-[#f9e2af]/10" },
+  medium: { dot: "bg-[#cba6f7]", cls: "text-[#cba6f7] border-[#cba6f7]/30 bg-[#cba6f7]/10" },
+  low: { dot: "bg-[#a6e3a1]", cls: "text-[#a6e3a1] border-[#a6e3a1]/30 bg-[#a6e3a1]/10" },
 };
 
 export function AuditPlayground() {
+  const { t } = useI18n();
   const [selectedVuln, setSelectedVuln] = useState<Vulnerability>(vulnerabilities[0]);
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
@@ -106,11 +109,7 @@ export function AuditPlayground() {
 
   const handleLineClick = (lineIdx: number) => {
     setFoundLine(lineIdx);
-    if (lineIdx === selectedVuln.vulnerableLine) {
-      setCorrect(true);
-    } else {
-      setCorrect(false);
-    }
+    setCorrect(lineIdx === selectedVuln.vulnerableLine);
   };
 
   const handleNextChallenge = () => {
@@ -128,45 +127,54 @@ export function AuditPlayground() {
   };
 
   return (
-    <section id="playground" className="py-24 px-6">
+    <section id="playground" className="py-24 px-6 bg-[#1e1e22] border-y border-border">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12"
+          className="mb-12 font-mono"
         >
-          <h2 className="text-2xl font-bold mb-2">Vulnerability Playground</h2>
-          <p className="text-muted-foreground">
-            Find the vulnerability in the code. Click on the vulnerable line.
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-primary text-sm">02</span>
+            <span className="text-2xl font-bold">
+              <span className="text-primary">#</span> {t("section.playground")}
+            </span>
+          </div>
+          <p className="text-muted-foreground text-sm">
+            <span className="text-term-muted">$</span> {t("playground.subtitle")}
           </p>
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Vulnerability List */}
           <div className="space-y-3">
-            {vulnerabilities.map((vuln) => (
-              <button
-                key={vuln.id}
-                onClick={() => {
-                  setSelectedVuln(vuln);
-                  resetState();
-                }}
-                className={`w-full text-left p-4 rounded-lg border transition-colors ${
-                  selectedVuln.id === vuln.id
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/50"
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="outline" className={severityColors[vuln.severity]}>
-                    {vuln.severity}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">{vuln.category}</span>
-                </div>
-                <span className="font-medium">{vuln.title}</span>
-              </button>
-            ))}
+            {vulnerabilities.map((vuln) => {
+              const sev = severityStyles[vuln.severity];
+              return (
+                <button
+                  key={vuln.id}
+                  onClick={() => {
+                    setSelectedVuln(vuln);
+                    resetState();
+                  }}
+                  className={`w-full text-left p-4 rounded border transition-colors font-mono cursor-pointer ${
+                    selectedVuln.id === vuln.id
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50 bg-card"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`w-2 h-2 rounded-full ${sev.dot}`} />
+                    <span className="text-xs text-muted-foreground">{t(vuln.categoryKey)}</span>
+                    <span className={`ml-auto text-[10px] uppercase px-1.5 py-0.5 rounded border ${sev.cls}`}>
+                      {t(`playground.severity.${vuln.severity}` as never)}
+                    </span>
+                  </div>
+                  <span className="text-sm">{t(vuln.titleKey)}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Code Panel */}
@@ -175,16 +183,24 @@ export function AuditPlayground() {
               key={selectedVuln.id}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="border border-border rounded-lg bg-card overflow-hidden"
+              className="border border-border rounded bg-card overflow-hidden"
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card/50">
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-[#1e1e22]">
                 <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-warning" />
-                  <span className="font-mono text-sm">{selectedVuln.title}</span>
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-[#f38ba8]/80" />
+                    <div className="w-3 h-3 rounded-full bg-[#f9e2af]/80" />
+                    <div className="w-3 h-3 rounded-full bg-[#a6e3a1]/80" />
+                  </div>
+                  <AlertTriangle className="w-4 h-4 text-[#f9e2af] ml-2" />
+                  <span className="font-mono text-sm">{t(selectedVuln.titleKey)}</span>
                 </div>
-                <Badge variant="outline" className={severityColors[selectedVuln.severity]}>
-                  {selectedVuln.severity}
+                <Badge
+                  variant="outline"
+                  className={`font-mono ${severityStyles[selectedVuln.severity].cls}`}
+                >
+                  {t(`playground.severity.${selectedVuln.severity}` as never)}
                 </Badge>
               </div>
 
@@ -197,21 +213,21 @@ export function AuditPlayground() {
                     className={`code-line vulnerable px-2 py-1 rounded flex items-center gap-4 ${
                       foundLine === idx
                         ? correct
-                          ? "bg-success/20"
-                          : "bg-critical/20"
+                          ? "bg-[#a6e3a1]/15"
+                          : "bg-[#f38ba8]/15"
                         : ""
                     }`}
                   >
-                    <span className="text-muted-foreground w-6 text-right select-none">
+                    <span className="text-term-muted w-6 text-right select-none">
                       {idx + 1}
                     </span>
                     <span className="whitespace-pre">{line || " "}</span>
                     {foundLine === idx && (
                       <span className="ml-auto">
                         {correct ? (
-                          <CheckCircle className="w-4 h-4 text-success" />
+                          <CheckCircle className="w-4 h-4 text-[#a6e3a1]" />
                         ) : (
-                          <AlertTriangle className="w-4 h-4 text-critical" />
+                          <AlertTriangle className="w-4 h-4 text-[#f38ba8]" />
                         )}
                       </span>
                     )}
@@ -224,35 +240,35 @@ export function AuditPlayground() {
                 {/* Result */}
                 {foundLine !== null && (
                   <div
-                    className={`p-3 rounded-lg text-sm ${
+                    className={`p-3 rounded text-sm font-mono ${
                       correct
-                        ? "bg-success/10 text-success border border-success/20"
-                        : "bg-critical/10 text-critical border border-critical/20"
+                        ? "bg-[#a6e3a1]/10 text-[#a6e3a1] border border-[#a6e3a1]/20"
+                        : "bg-[#f38ba8]/10 text-[#f38ba8] border border-[#f38ba8]/20"
                     }`}
                   >
-                    {correct
-                      ? "Correct! You found the vulnerable line."
-                      : "Not quite. Try another line or use a hint."}
+                    {correct ? t("playground.correct") : t("playground.wrong")}
                   </div>
                 )}
 
                 {/* Hint */}
                 {showHint && (
-                  <div className="p-3 rounded-lg bg-primary/10 text-sm border border-primary/20">
-                    <span className="font-semibold">Hint:</span> {selectedVuln.hint}
+                  <div className="p-3 rounded bg-primary/10 text-sm border border-primary/20 font-mono">
+                    <span className="font-semibold text-primary">{t("playground.hint")}</span>{" "}
+                    {t(selectedVuln.hintKey)}
                   </div>
                 )}
 
                 {/* Solution */}
                 {showSolution && (
-                  <div className="p-3 rounded-lg bg-card border border-border text-sm space-y-2">
+                  <div className="p-3 rounded bg-card border border-border text-sm space-y-2 font-mono">
                     <p>
-                      <span className="font-semibold">Explanation:</span>{" "}
-                      {selectedVuln.explanation}
+                      <span className="font-semibold text-primary">{t("playground.explanation")}</span>{" "}
+                      {t(selectedVuln.explanationKey)}
                     </p>
-                    {selectedVuln.poc && (
+                    {selectedVuln.pocKey && (
                       <p className="text-muted-foreground">
-                        <span className="font-semibold">PoC:</span> {selectedVuln.poc}
+                        <span className="font-semibold text-term-cmd">{t("playground.poc")}</span>{" "}
+                        {t(selectedVuln.pocKey)}
                       </p>
                     )}
                   </div>
@@ -264,24 +280,26 @@ export function AuditPlayground() {
                     variant="outline"
                     size="sm"
                     onClick={() => setShowHint(!showHint)}
+                    className="font-mono"
                   >
                     {showHint ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
-                    {showHint ? "Hide Hint" : "Show Hint"}
+                    {showHint ? t("playground.hideHint") : t("playground.showHint")}
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setShowSolution(!showSolution)}
+                    className="font-mono"
                   >
-                    {showSolution ? "Hide Solution" : "Show Solution"}
+                    {showSolution ? t("playground.hideSolution") : t("playground.showSolution")}
                   </Button>
                   <Button
                     variant="default"
                     size="sm"
                     onClick={handleNextChallenge}
-                    className="ml-auto"
+                    className="ml-auto font-mono"
                   >
-                    Next Challenge
+                    {t("playground.next")}
                     <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
                 </div>

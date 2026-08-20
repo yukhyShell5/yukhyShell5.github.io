@@ -1,59 +1,53 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Terminal, Menu, X, ChevronDown, BookOpen, Shield, Gamepad2, Lock, FileText } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Github } from "lucide-react";
+import { useI18n, type Lang } from "@/components/i18n";
 
-interface ProjectLink {
-  href: string;
-  label: string;
-  icon: React.ElementType;
-  description: string;
-  status?: "coming-soon";
+function LangToggle() {
+  const { lang, setLang } = useI18n();
+  const toggle = (l: Lang) => setLang(l);
+
+  return (
+    <div className="flex items-center border border-border font-mono text-[10px] uppercase tracking-[0.16em]">
+      <button
+        onClick={() => toggle("fr")}
+        className={`cursor-pointer px-2.5 py-[7px] transition-colors ${
+          lang === "fr"
+            ? "bg-foreground text-background"
+            : "text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        fr
+      </button>
+      <button
+        onClick={() => toggle("en")}
+        className={`cursor-pointer px-2.5 py-[7px] transition-colors ${
+          lang === "en"
+            ? "bg-foreground text-background"
+            : "text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        en
+      </button>
+    </div>
+  );
 }
 
-const projectLinks: ProjectLink[] = [
-  { 
-    href: "/logs-anonymizer", 
-    label: "Logs Anonymizer", 
-    icon: Shield,
-    description: "Anonymize sensitive data in logs"
-  },
-  { 
-    href: "/chess-learn", 
-    label: "Chess Learn", 
-    icon: Gamepad2,
-    description: "Interactive chess study platform"
-  },
-  { 
-    href: "/crackstation", 
-    label: "Crackstation", 
-    icon: Lock,
-    description: "Password security toolkit",
-    status: "coming-soon"
-  },
-  { 
-    href: "/wiki", 
-    label: "Wiki", 
-    icon: BookOpen,
-    description: "Articles & research notes",
-    status: "coming-soon"
-  },
-];
-
-const navItems = [
-  { href: "#about", label: "About" },
-  { href: "#playground", label: "Playground" },
-  { href: "#contact", label: "Contact" },
-];
-
 export function Nav() {
+  const { t } = useI18n();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [projectsOpen, setProjectsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const navLinks = [
+    { href: "/#about", label: t("nav.about") },
+    { href: "/#playground", label: t("nav.playground") },
+    { href: "/#projects", label: t("nav.projects") },
+    { href: "/#contact", label: t("nav.contact") },
+    { href: "/wiki", label: t("nav.wiki") },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,160 +57,124 @@ export function Nav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setProjectsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   return (
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-background/80 backdrop-blur-lg border-b border-border"
-          : "bg-transparent"
+      className={`fixed top-0 left-0 right-0 z-50 border-b border-input transition-all duration-300 ${
+        isScrolled ? "bg-background/90 backdrop-blur-lg" : "bg-transparent"
       }`}
     >
-      <nav className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-mono font-semibold">
-          <Terminal className="w-5 h-5 text-primary" />
-          <span>yukhyShell5</span>
+      <nav className="mx-auto flex h-[60px] max-w-[1600px] items-center gap-8 px-8">
+        {/* Logo */}
+        <Link
+          href="/"
+          className="flex items-center gap-2.5 text-foreground transition-colors hover:text-primary"
+        >
+          <span className="font-mono text-xl leading-none text-primary">❯</span>
+          <span className="font-mono text-xl font-bold tracking-tighter">
+            yukhyShell5
+          </span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-8">
-          {navItems.map((item) => (
+        <div className="flex-1" />
+
+        {/* Desktop nav */}
+        <div className="hidden items-center gap-8 md:flex">
+          {navLinks.map((link) => (
             <Link
-              key={item.href}
-              href={item.href}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              key={link.href}
+              href={link.href}
+              className="font-mono text-[11.5px] uppercase tracking-[0.07em] text-muted-foreground transition-colors hover:text-foreground"
             >
-              {item.label}
+              {link.label}
             </Link>
           ))}
-          
-          {/* Projects Dropdown */}
-          <div ref={dropdownRef} className="relative">
-            <button
-              onClick={() => setProjectsOpen(!projectsOpen)}
-              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Projects
-              <ChevronDown className={`w-4 h-4 transition-transform ${projectsOpen ? "rotate-180" : ""}`} />
-            </button>
 
-            <AnimatePresence>
-              {projectsOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute top-full right-0 mt-2 w-64 p-2 rounded-lg border border-border bg-card/95 backdrop-blur-lg shadow-lg"
-                >
-                  {projectLinks.map((project) => (
-                    <Link
-                      key={project.href}
-                      href={project.status === "coming-soon" ? "#" : project.href}
-                      onClick={() => setProjectsOpen(false)}
-                      className={`flex items-start gap-3 p-3 rounded-md transition-colors ${
-                        project.status === "coming-soon" 
-                          ? "opacity-50 cursor-default" 
-                          : "hover:bg-accent"
-                      }`}
-                    >
-                      <project.icon className="w-5 h-5 text-primary mt-0.5" />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-sm">{project.label}</span>
-                          {project.status === "coming-soon" && (
-                            <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">
-                              Soon
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {project.description}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          <a
+            href="https://github.com/yukhyShell5"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            className="inline-flex h-[30px] w-[30px] items-center justify-center border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+          >
+            <Github className="h-3.5 w-3.5" />
+          </a>
 
-          <div className="text-xs text-muted-foreground border border-border rounded px-2 py-1">
-            <kbd>⌘</kbd> + <kbd>K</kbd>
-          </div>
+          <LangToggle />
+
+          <Link
+            href="/#contact"
+            className="border border-border px-[15px] py-[7px] font-mono text-[11.5px] uppercase tracking-[0.07em] text-foreground transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground"
+          >
+            {t("nav.contact")}
+          </Link>
         </div>
 
-        {/* Mobile Menu Toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </Button>
+        {/* Mobile toggle */}
+        <div className="flex items-center gap-3 md:hidden">
+          <LangToggle />
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-expanded={mobileMenuOpen}
+            aria-label="Menu"
+            className="flex h-[30px] w-[30px] flex-col items-center justify-center gap-1 border border-border text-muted-foreground"
+          >
+            <span
+              className={`block h-px w-3.5 bg-current transition-transform ${
+                mobileMenuOpen ? "translate-y-[3px] rotate-45" : ""
+              }`}
+            />
+            <span
+              className={`block h-px w-3.5 bg-current transition-opacity ${
+                mobileMenuOpen ? "opacity-0" : ""
+              }`}
+            />
+            <span
+              className={`block h-px w-3.5 bg-current transition-transform ${
+                mobileMenuOpen ? "-translate-y-[3px] -rotate-45" : ""
+              }`}
+            />
+          </button>
+        </div>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile sheet */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-background/95 backdrop-blur-lg border-b border-border overflow-hidden"
+            className="overflow-hidden border-b border-border bg-background/95 backdrop-blur-lg md:hidden"
           >
-            <div className="px-6 py-4 flex flex-col gap-4">
-              {navItems.map((item) => (
+            <div className="flex flex-col px-6 font-mono">
+              {navLinks.map((link) => (
                 <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  key={link.href}
+                  href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
+                  className="border-b border-border py-4 text-xs uppercase tracking-[0.07em] text-foreground"
                 >
-                  {item.label}
+                  {link.label}
                 </Link>
               ))}
-              
-              {/* Projects Section Mobile */}
-              <div className="border-t border-border pt-4 mt-2">
-                <span className="text-xs uppercase tracking-wider text-muted-foreground mb-3 block">
-                  Projects
-                </span>
-                <div className="space-y-3">
-                  {projectLinks.map((project) => (
-                    <Link
-                      key={project.href}
-                      href={project.status === "coming-soon" ? "#" : project.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 ${
-                        project.status === "coming-soon" 
-                          ? "opacity-50 cursor-default" 
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      <project.icon className="w-4 h-4 text-primary" />
-                      <span>{project.label}</span>
-                      {project.status === "coming-soon" && (
-                        <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary ml-auto">
-                          Soon
-                        </span>
-                      )}
-                    </Link>
-                  ))}
-                </div>
+              <div className="flex items-center justify-between py-4">
+                <a
+                  href="https://github.com/yukhyShell5"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-[30px] w-[30px] items-center justify-center border border-border text-muted-foreground"
+                >
+                  <Github className="h-3.5 w-3.5" />
+                </a>
+                <Link
+                  href="/#contact"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="border border-border px-[15px] py-[7px] text-xs uppercase tracking-[0.07em] text-foreground"
+                >
+                  {t("nav.contact")}
+                </Link>
               </div>
             </div>
           </motion.div>

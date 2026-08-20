@@ -394,6 +394,48 @@ button:disabled,
   background: color-mix(in srgb, var(--critical) 5%, var(--card));
 }
 
+/* --- Barre de retour vers le portfolio ------------------------------------- */
+.ys-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 1rem;
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.75rem;
+}
+.ys-topbar a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.ys-topbar a:hover {
+  color: var(--primary);
+}
+.ys-topbar .ys-topbar-brand {
+  color: var(--primary);
+  font-weight: 600;
+}
+.ys-topbar .ys-topbar-sep {
+  color: var(--term-muted);
+}
+.ys-topbar .ys-topbar-tool {
+  color: var(--dim);
+}
+.ys-topbar .ys-topbar-home {
+  margin-left: auto;
+}
+
 /* Fenêtre terminal décorative */
 .ys-terminal {
   background: var(--card);

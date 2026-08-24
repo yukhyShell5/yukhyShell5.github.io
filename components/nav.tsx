@@ -45,7 +45,6 @@ export function Nav() {
     { href: "/#about", label: t("nav.about") },
     { href: "/#playground", label: t("nav.playground") },
     { href: "/#projects", label: t("nav.projects") },
-    { href: "/#contact", label: t("nav.contact") },
     { href: "/wiki", label: t("nav.wiki") },
   ];
 

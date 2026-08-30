@@ -127,17 +127,17 @@ export function AuditPlayground() {
   };
 
   return (
-    <section id="playground" className="py-24 px-6 bg-[#1e1e22] border-y border-border">
+    <section id="playground" className="py-24 px-4 sm:px-6 bg-[#1e1e22] border-y border-border">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12 font-mono"
+          className="mb-12 font-mono break-words"
         >
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-primary text-sm">02</span>
-            <span className="text-2xl font-bold">
+            <span className="text-primary text-sm shrink-0">02</span>
+            <span className="text-xl sm:text-2xl font-bold">
               <span className="text-primary">#</span> {t("section.playground")}
             </span>
           </div>
@@ -178,7 +178,7 @@ export function AuditPlayground() {
           </div>
 
           {/* Code Panel */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 min-w-0">
             <motion.div
               key={selectedVuln.id}
               initial={{ opacity: 0 }}
@@ -187,18 +187,18 @@ export function AuditPlayground() {
             >
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-[#1e1e22]">
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1.5">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex gap-1.5 shrink-0">
                     <div className="w-3 h-3 rounded-full bg-[#f38ba8]/80" />
                     <div className="w-3 h-3 rounded-full bg-[#f9e2af]/80" />
                     <div className="w-3 h-3 rounded-full bg-[#a6e3a1]/80" />
                   </div>
-                  <AlertTriangle className="w-4 h-4 text-[#f9e2af] ml-2" />
-                  <span className="font-mono text-sm">{t(selectedVuln.titleKey)}</span>
+                  <AlertTriangle className="w-4 h-4 text-[#f9e2af] ml-2 shrink-0" />
+                  <span className="font-mono text-sm truncate">{t(selectedVuln.titleKey)}</span>
                 </div>
                 <Badge
                   variant="outline"
-                  className={`font-mono ${severityStyles[selectedVuln.severity].cls}`}
+                  className={`font-mono shrink-0 ${severityStyles[selectedVuln.severity].cls}`}
                 >
                   {t(`playground.severity.${selectedVuln.severity}` as never)}
                 </Badge>
@@ -210,7 +210,7 @@ export function AuditPlayground() {
                   <div
                     key={idx}
                     onClick={() => handleLineClick(idx)}
-                    className={`code-line vulnerable px-2 py-1 rounded flex items-center gap-4 ${
+                    className={`code-line vulnerable px-2 py-1 rounded flex items-center gap-4 w-max min-w-full ${
                       foundLine === idx
                         ? correct
                           ? "bg-[#a6e3a1]/15"
@@ -218,12 +218,12 @@ export function AuditPlayground() {
                         : ""
                     }`}
                   >
-                    <span className="text-term-muted w-6 text-right select-none">
+                    <span className="text-term-muted w-6 text-right select-none shrink-0">
                       {idx + 1}
                     </span>
                     <span className="whitespace-pre">{line || " "}</span>
                     {foundLine === idx && (
-                      <span className="ml-auto">
+                      <span className="ml-auto shrink-0 pl-4">
                         {correct ? (
                           <CheckCircle className="w-4 h-4 text-[#a6e3a1]" />
                         ) : (

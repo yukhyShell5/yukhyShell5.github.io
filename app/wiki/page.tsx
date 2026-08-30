@@ -17,7 +17,7 @@ export default function WikiHome() {
   );
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-14">
+    <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
       <div className="mb-10">
         <div className="mb-4 flex items-center gap-2 font-mono text-xs text-primary">
           <BookOpen className="h-4 w-4" />

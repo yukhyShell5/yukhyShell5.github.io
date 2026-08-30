@@ -34,17 +34,17 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 px-6">
+    <section id="contact" className="py-24 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12 font-mono"
+          className="mb-12 font-mono break-words"
         >
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-primary text-sm">04</span>
-            <span className="text-2xl font-bold">
+            <span className="text-primary text-sm shrink-0">04</span>
+            <span className="text-xl sm:text-2xl font-bold">
               <span className="text-primary">#</span> {t("section.contact")}
             </span>
           </div>

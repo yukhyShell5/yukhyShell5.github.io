@@ -64,14 +64,14 @@ export function Nav() {
         isScrolled ? "bg-background/90 backdrop-blur-lg" : "bg-transparent"
       }`}
     >
-      <nav className="mx-auto flex h-[60px] max-w-[1600px] items-center gap-8 px-8">
+      <nav className="mx-auto flex h-[60px] w-full max-w-[1600px] items-center gap-4 md:gap-8 px-4 md:px-8">
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2.5 text-foreground transition-colors hover:text-primary"
+          className="flex items-center gap-2.5 text-foreground transition-colors hover:text-primary min-w-0 shrink-0"
         >
           <span className="font-mono text-xl leading-none text-primary">❯</span>
-          <span className="font-mono text-xl font-bold tracking-tighter">
+          <span className="font-mono text-xl font-bold tracking-tighter truncate">
             yukhyShell5
           </span>
         </Link>

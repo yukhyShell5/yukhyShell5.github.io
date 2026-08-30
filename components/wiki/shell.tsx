@@ -51,7 +51,7 @@ export function WikiShell({
           </div>
         </details>
 
-        <article className="mx-auto w-full max-w-4xl px-8 py-12">{children}</article>
+        <article className="mx-auto w-full max-w-4xl px-4 sm:px-8 py-8 sm:py-12">{children}</article>
       </main>
     </div>
   );

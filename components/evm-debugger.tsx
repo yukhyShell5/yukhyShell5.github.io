@@ -35,17 +35,17 @@ export function EvmDebugger() {
   ];
 
   return (
-    <section id="about" className="py-24 px-6">
+    <section id="about" className="py-24 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12 font-mono"
+          className="mb-12 font-mono break-words"
         >
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-primary text-sm">01</span>
-            <span className="text-2xl font-bold">
+            <span className="text-primary text-sm shrink-0">01</span>
+            <span className="text-xl sm:text-2xl font-bold">
               <span className="text-primary">#</span> {t("section.about")}
             </span>
           </div>
@@ -63,15 +63,15 @@ export function EvmDebugger() {
         >
           {/* Header */}
           <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-[#1e1e22]">
-            <div className="w-3 h-3 rounded-full bg-[#f38ba8]/80" />
-            <div className="w-3 h-3 rounded-full bg-[#f9e2af]/80" />
-            <div className="w-3 h-3 rounded-full bg-[#a6e3a1]/80" />
-            <span className="ml-2 text-xs text-term-muted">evm-debugger.sol</span>
-            <span className="ml-auto text-[10px] text-term-muted">0x01</span>
+            <div className="w-3 h-3 rounded-full bg-[#f38ba8]/80 shrink-0" />
+            <div className="w-3 h-3 rounded-full bg-[#f9e2af]/80 shrink-0" />
+            <div className="w-3 h-3 rounded-full bg-[#a6e3a1]/80 shrink-0" />
+            <span className="ml-2 text-xs text-term-muted truncate">evm-debugger.sol</span>
+            <span className="ml-auto text-[10px] text-term-muted shrink-0">0x01</span>
           </div>
 
           {/* Content Grid */}
-          <div className="grid md:grid-cols-3 divide-x divide-border">
+          <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
             {/* Stack */}
             <div className="p-4">
               <div className="text-xs text-term-muted uppercase tracking-wider mb-4">

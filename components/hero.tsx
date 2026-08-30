@@ -102,13 +102,13 @@ function TerminalSession() {
                     ? "text-term-dim"
                     : "text-foreground";
             return (
-              <div key={i} className={cls}>
+              <div key={i} className={`${cls} whitespace-pre-wrap break-words`}>
                 {item.line.text}
               </div>
             );
           }
           return (
-            <div key={i} className="text-foreground">
+            <div key={i} className="text-foreground whitespace-pre-wrap break-words">
               <span className="text-term-prompt">❯ </span>
               {item.cmd}
             </div>
@@ -213,7 +213,7 @@ export function Hero() {
   const { t } = useI18n();
 
   return (
-    <section className="min-h-screen flex flex-col items-center justify-center relative px-6 pt-24 pb-16 overflow-hidden">
+    <section className="min-h-screen flex flex-col items-center justify-center relative px-4 sm:px-6 pt-24 pb-16 overflow-hidden">
       {/* Background grid + vignette */}
       <div className="absolute inset-0 bg-grid" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(23,23,26,0.7)_100%)]" />
@@ -225,7 +225,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="text-4xl sm:text-6xl font-bold mb-4 font-mono tracking-tight"
+          className="text-3xl sm:text-5xl md:text-6xl font-bold mb-4 font-mono tracking-tight break-words"
         >
           <span className="text-primary">~/</span>
           yukhyShell5

@@ -36,11 +36,12 @@ export function Projects() {
       status: "active",
     },
     {
-      name: "crackstation",
-      descKey: "projects.desc.crackstation",
-      path: "/crackstation",
-      tags: ["Security", "Cryptography", "Tool"],
-      status: "coming-soon",
+      name: "pythia",
+      descKey: "projects.desc.pythia",
+      path: "/pythia",
+      githubUrl: "https://github.com/yukhyShell5/pythia",
+      tags: ["Security", "EVM", "Decompiler", "Tool"],
+      status: "active",
     },
   ];
 

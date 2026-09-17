@@ -19,7 +19,7 @@ import {
   ExternalLink,
   Shield,
   Gamepad2,
-  Lock,
+  Eye,
   BookOpen,
   KeyRound,
 } from "lucide-react";
@@ -57,7 +57,7 @@ export function CommandPalette() {
       items: [
         { icon: Shield, label: t("nav.project.logs"), action: "navigate", target: "/logs-anonymizer" },
         { icon: Gamepad2, label: t("nav.project.chess"), action: "navigate", target: "/chess-learn" },
-        { icon: Lock, label: t("nav.project.crackstation"), action: "navigate", target: "/crackstation", disabled: true },
+        { icon: Eye, label: t("nav.project.pythia"), action: "navigate", target: "/pythia" },
         { icon: BookOpen, label: t("nav.project.wiki"), action: "navigate", target: "/wiki" },
       ],
     },

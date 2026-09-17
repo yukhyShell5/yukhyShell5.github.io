@@ -14,11 +14,11 @@ const translations = {
     "nav.wiki": "Wiki",
     "nav.project.logs": "Logs Anonymizer",
     "nav.project.chess": "Chess Learn",
-    "nav.project.crackstation": "Crackstation",
+    "nav.project.pythia": "Pythia",
     "nav.project.wiki": "Wiki",
     "nav.desc.logs": "Anonymise les données sensibles dans les logs",
     "nav.desc.chess": "Plateforme interactive d'étude des échecs",
-    "nav.desc.crackstation": "Boîte à outils de sécurité des mots de passe",
+    "nav.desc.pythia": "Moteur symbolique, décompilateur et visualiseur de graphe EVM",
     "nav.desc.wiki": "Articles et notes de recherche",
     "nav.soon": "Bientôt",
 
@@ -103,8 +103,8 @@ const translations = {
       "Outil d'anonymisation des données sensibles dans les fichiers de logs. Patterns personnalisés et détection par regex.",
     "projects.desc.chess":
       "Plateforme interactive d'apprentissage des échecs avec outils d'étude et visualisation des variantes.",
-    "projects.desc.crackstation":
-      "Boîte à outils avancée d'analyse et de test de sécurité des mots de passe. Bientôt disponible.",
+    "projects.desc.pythia":
+      "Décompilateur EVM, moteur d'exécution symbolique basé sur Z3 et outil de génération de graphe de flux de contrôle (CFG) visuel interactif.",
     "projects.status.active": "Actif",
     "projects.status.soon": "Bientôt",
     "projects.status.archived": "Archivé",
@@ -139,11 +139,11 @@ const translations = {
     "nav.wiki": "Wiki",
     "nav.project.logs": "Logs Anonymizer",
     "nav.project.chess": "Chess Learn",
-    "nav.project.crackstation": "Crackstation",
+    "nav.project.pythia": "Pythia",
     "nav.project.wiki": "Wiki",
     "nav.desc.logs": "Anonymize sensitive data in logs",
     "nav.desc.chess": "Interactive chess study platform",
-    "nav.desc.crackstation": "Password security toolkit",
+    "nav.desc.pythia": "EVM Symbolic Engine, Decompiler & CFG Visualizer",
     "nav.desc.wiki": "Articles & research notes",
     "nav.soon": "Soon",
 
@@ -228,8 +228,8 @@ const translations = {
       "Tool for anonymizing sensitive data in log files. Supports custom patterns and regex-based detection.",
     "projects.desc.chess":
       "Interactive chess learning platform with study tools and variant visualization.",
-    "projects.desc.crackstation":
-      "Advanced password analysis and security testing toolkit. Coming soon.",
+    "projects.desc.pythia":
+      "EVM decompiler, Z3-based symbolic execution engine, and interactive Control Flow Graph (CFG) visualization tool.",
     "projects.status.active": "Active",
     "projects.status.soon": "Coming Soon",
     "projects.status.archived": "Archived",

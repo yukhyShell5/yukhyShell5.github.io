@@ -72,7 +72,7 @@ export default function WikiHome() {
                     </p>
                   )}
                   <ul className="mt-4 flex-1 space-y-1.5">
-                    {discipline.courses.map((course) => (
+                    {discipline.courses.slice(0, 10).map((course) => (
                       <li
                         key={course.slug}
                         className="flex items-center gap-2 font-mono text-sm"
@@ -85,6 +85,14 @@ export default function WikiHome() {
                         </span>
                       </li>
                     ))}
+                    {discipline.courses.length > 10 && (
+                      <li className="flex items-center gap-2 font-mono text-sm">
+                        <span className="w-6 shrink-0 text-primary/40">•</span>
+                        <span className="truncate text-muted-foreground/70 italic">
+                          + {discipline.courses.length - 10} modules...
+                        </span>
+                      </li>
+                    )}
                   </ul>
                   <div className="mt-4 flex items-center gap-1 font-mono text-xs text-primary/80">
                     Explorer

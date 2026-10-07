@@ -105,6 +105,8 @@ const translations = {
       "Plateforme interactive d'apprentissage des échecs avec outils d'étude et visualisation des variantes.",
     "projects.desc.pythia":
       "Décompilateur EVM, moteur d'exécution symbolique basé sur Z3 et outil de génération de graphe de flux de contrôle (CFG) visuel interactif.",
+    "projects.desc.tablet_paint":
+      "Application de dessin performante et sans backend, optimisée pour les tablettes graphiques.",
     "projects.status.active": "Actif",
     "projects.status.soon": "Bientôt",
     "projects.status.archived": "Archivé",
@@ -230,6 +232,8 @@ const translations = {
       "Interactive chess learning platform with study tools and variant visualization.",
     "projects.desc.pythia":
       "EVM decompiler, Z3-based symbolic execution engine, and interactive Control Flow Graph (CFG) visualization tool.",
+    "projects.desc.tablet_paint":
+      "Fast, backend-free web drawing application tailored for graphics tablets.",
     "projects.status.active": "Active",
     "projects.status.soon": "Coming Soon",
     "projects.status.archived": "Archived",

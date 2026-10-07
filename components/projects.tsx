@@ -43,6 +43,14 @@ export function Projects() {
       tags: ["Security", "EVM", "Decompiler", "Tool"],
       status: "active",
     },
+    {
+      name: "tablet-paint",
+      descKey: "projects.desc.tablet_paint",
+      path: "/tablet-paint",
+      githubUrl: "https://github.com/yukhyShell5/tablet-paint",
+      tags: ["Web App", "Canvas", "React"],
+      status: "active",
+    },
   ];
 
   const statusBadge = {
